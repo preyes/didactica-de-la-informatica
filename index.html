@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuadro Comparativo - Enfoques Educativos Digitales</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: #6c757d;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .filter-btn.active {
+            background: #007bff;
+            transform: scale(1.05);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-bottom: 3px solid #3498db;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .comparison-table td {
+            padding: 20px 15px;
+            vertical-align: top;
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .comparison-table tr:hover td {
+            background: #f8f9fa;
+            transform: scale(1.01);
+        }
+
+        .row-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+            color: white !important;
+            font-weight: 600;
+            text-align: center;
+            border-right: 3px solid #3498db;
+            min-width: 200px;
+        }
+
+        .cell-content {
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
+            border-left: 4px solid #f39c12;
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .enfoque-critico {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .enfoque-tecnico {
+            border-left: 4px solid #3498db;
+        }
+
+        .enfoque-mixto {
+            border-left: 4px solid #27ae60;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+        }
+
+        .legend {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            min-width: 250px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0,123,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+            
+            .comparison-table th,
+            .comparison-table td {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Enfoques Educativos Digitales</h1>
+            <p>Comparación interactiva de metodologías de enseñanza tecnológica</p>
+        </div>
+
+        <div class="controls">
+            <input type="text" class="search-box" placeholder="🔍 Buscar en el contenido..." id="searchBox">
+            <button class="filter-btn active" data-filter="all">Ver Todo</button>
+            <button class="filter-btn" data-filter="critico">Enfoque Crítico</button>
+            <button class="filter-btn" data-filter="tecnico">Enfoque Técnico</button>
+            <button class="filter-btn" data-filter="mixto">Enfoque Mixto</button>
+        </div>
+
+        <table class="comparison-table" id="comparisonTable">
+            <thead>
+                <tr>
+                    <th style="width: 200px;">Criterio</th>
+                    <th class="enfoque-critico">Educación Digital Crítica<br><small>(Bebea)</small></th>
+                    <th class="enfoque-tecnico">Ciencias de la Computación<br><small>(Sadosky)</small></th>
+                    <th class="enfoque-mixto">Alfabetización Digital Crítica<br><small>(Bebea)</small></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="row-contenidos">
+                    <td class="row-header">📖 Contenidos y Tratamiento</td>
+                    <td class="cell-content enfoque-critico">
+                        <strong>Hardware como parte de la vida cotidiana</strong><br>
+                        • Reflexión sobre el consumo<br>
+                        • Explotación de recursos<br>
+                        • Necesidad de austeridad tecnológica<br>
+                        <em>Enfoque reflexivo y crítico sobre el impacto social</em>
+                    </td>
+                    <td class="cell-content enfoque-tecnico">
+                        <strong>Arquitectura de von Neumann</strong><br>
+                        • CPU y memoria<br>
+                        • Componentes internos<br>
+                        • Funcionamiento del hardware<br>
+                        • Ejecución de programas<br>
+                        <em>Contenido estructurado y técnico</em>
+                    </td>
+                    <td class="cell-content enfoque-mixto">
+                        <strong>Hardware básico accesible</strong><br>
+                        • CPU, RAM, disco, etc.<br>
+                        • Objetos a conocer y reflexionar<br>
+                        • Perspectiva humana y simbólica<br>
+                        <em>Balance entre técnico y reflexivo</em>
+                    </td>
+                </tr>
+                <tr class="row-sugerencias">
+                    <td class="row-header">👨‍🏫 Sugerencias para Docentes</td>
+                    <td class="cell-content enfoque-critico">
+                        • <strong>Desmontar ordenadores en grupo</strong><br>
+                        • Espacios de reflexión simbólica<br>
+                        • Dinámicas corporales (ojos vendados)<br>
+                        • Acompañamiento emocional<br>
+                        • Respetar tiempos individuales
+                    </td>
+                    <td class="cell-content enfoque-tecnico">
+                        • <strong>Actividades progresivas y claras</strong><br>
+                        • Desensamblar computadoras reales<br>
+                        • Uso de analogías explicativas<br>
+                        • Guías con indicaciones detalladas<br>
+                        • Estructura metodológica definida
+                    </td>
+                    <td class="cell-content enfoque-mixto">
+                        • <strong>Facilitar contacto físico con hardware</strong><br>
+                        • Acompañar sin tecnicismos<br>
+                        • Centrado en el descubrimiento<br>
+                        • Trabajo colaborativo<br>
+                        • Exploración guiada
+                    </td>
+                </tr>
+                <tr class="row-intervenciones">
+                    <td class="row-header">🎯 Orientaciones de Intervención</td>
+                    <td class="cell-content enfoque-critico">
+                        • <strong>Acompañar procesos personales</strong><br>
+                        • Intervenir con preguntas abiertas<br>
+                        • Actitud de respeto<br>
+                        • Buscar desde la experiencia ante dificultades<br>
+                        • Facilitador de reflexión
+                    </td>
+                    <td class="cell-content enfoque-tecnico">
+                        • <strong>Intervención precisa ante errores</strong><br>
+                        • Anticipaciones conceptuales<br>
+                        • Explicaciones por analogía<br>
+                        • Instrucciones para resolver errores<br>
+                        • Corrección técnica sistemática
+                    </td>
+                    <td class="cell-content enfoque-mixto">
+                        • <strong>Intervenir solo para guiar</strong><br>
+                        • No imponer respuestas<br>
+                        • Abrir preguntas, no cerrarlas<br>
+                        • Construcción colectiva del sentido<br>
+                        • Mediación reflexiva
+                    </td>
+                </tr>
+                <tr class="row-habilidades">
+                    <td class="row-header">🎓 Habilidades a Desarrollar</td>
+                    <td class="cell-content enfoque-critico">
+                        • <strong>Conciencia crítica tecnológica</strong><br>
+                        • Capacidad de desapego material<br>
+                        • Habilidades socioemocionales<br>
+                        • Empatía y escucha<br>
+                        • Introspección personal
+                    </td>
+                    <td class="cell-content enfoque-tecnico">
+                        • <strong>Comprensión técnica de computadoras</strong><br>
+                        • Razonamiento lógico<br>
+                        • Pensamiento computacional<br>
+                        • Análisis funcional<br>
+                        • Competencias técnicas específicas
+                    </td>
+                    <td class="cell-content enfoque-mixto">
+                        • <strong>Capacidad de observación</strong><br>
+                        • Trabajo en equipo<br>
+                        • Comprensión básica digital<br>
+                        • Reflexión sobre relación con tecnología<br>
+                        • Competencias integradas
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e74c3c;"></div>
+                <span>Enfoque Crítico (Bebea)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #3498db;"></div>
+                <span>Enfoque Técnico (Sadosky)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #27ae60;"></div>
+                <span>Enfoque Mixto (Bebea)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalContent"></p>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidad de filtros
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const tableRows = document.querySelectorAll('.comparison-table tbody tr');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Actualizar botones activos
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                const filter = button.getAttribute('data-filter');
+                
+                // Mostrar/ocultar columnas según el filtro
+                const headers = document.querySelectorAll('.comparison-table th');
+                const cells = document.querySelectorAll('.comparison-table td');
+                
+                if (filter === 'all') {
+                    headers.forEach(header => header.style.display = '');
+                    cells.forEach(cell => cell.style.display = '');
+                } else {
+                    headers.forEach((header, index) => {
+                        if (index === 0) {
+                            header.style.display = '';
+                        } else if ((filter === 'critico' && index === 1) ||
+                                 (filter === 'tecnico' && index === 2) ||
+                                 (filter === 'mixto' && index === 3)) {
+                            header.style.display = '';
+                        } else {
+                            header.style.display = 'none';
+                        }
+                    });
+                    
+                    tableRows.forEach(row => {
+                        const rowCells = row.querySelectorAll('td');
+                        rowCells.forEach((cell, index) => {
+                            if (index === 0) {
+                                cell.style.display = '';
+                            } else if ((filter === 'critico' && index === 1) ||
+                                     (filter === 'tecnico' && index === 2) ||
+                                     (filter === 'mixto' && index === 3)) {
+                                cell.style.display = '';
+                            } else {
+                                cell.style.display = 'none';
+                            }
+                        });
+                    });
+                }
+            });
+        });
+
+        // Funcionalidad de búsqueda
+        const searchBox = document.getElementById('searchBox');
+        
+        searchBox.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            tableRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let found = false;
+                
+                cells.forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                        found = true;
+                    }
+                });
+                
+                if (found || searchTerm === '') {
+                    row.style.display = '';
+                    if (searchTerm !== '') {
+                        cells.forEach(cell => {
+                            if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                                cell.classList.add('highlight');
+                            } else {
+                                cell.classList.remove('highlight');
+                            }
+                        });
+                    } else {
+                        cells.forEach(cell => cell.classList.remove('highlight'));
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Efectos de hover mejorados
+        const cells = document.querySelectorAll('.comparison-table td:not(.row-header)');
+        
+        cells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                const content = cell.innerHTML;
+                const modal = document.getElementById('detailModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalContent = document.getElementById('modalContent');
+                
+                modalTitle.textContent = 'Detalle del Contenido';
+                modalContent.innerHTML = content;
+                modal.style.display = 'block';
+            });
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('detailModal');
+        const closeBtn = document.querySelector('.close');
+        
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Animación de entrada
+        document.addEventListener('DOMContentLoaded', () => {
+            const rows = document.querySelectorAll('.comparison-table tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.5s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
